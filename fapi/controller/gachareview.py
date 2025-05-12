@@ -27,3 +27,23 @@ def post_review(
     if not result:
         raise HTTPException(status_code=400, detail="리뷰 등록 실패")
     return {"message": "리뷰 등록 완료", "review": result}
+
+@router.get("/gacha/{gacha_id}")
+def get_reviews_by_gacha(gacha_id: int):
+    try:
+        reviews = pgsql_gachareview.get_reviews_by_gacha_id(gacha_id)
+        if not reviews:
+            return {
+                "count": 0,
+                "gacha_id": gacha_id,
+                "reviews": [],
+                "message": "등록된 리뷰가 없습니다."
+            }
+        return {
+            "count": len(reviews),
+            "gacha_id": gacha_id,
+            "reviews": reviews
+        }
+    except Exception as e:
+        print("리뷰 조회 오류:", e)
+        raise HTTPException(status_code=500, detail="리뷰 조회 중 오류 발생")
